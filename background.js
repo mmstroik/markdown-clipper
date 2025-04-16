@@ -48,8 +48,11 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 </html>`;
 
     // Open a new tab with the generated HTML
-    chrome.tabs.create({
-      url: "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent),
+    chrome.storage.sync.get({ openNextToCurrent: true }, function (settings) {
+      chrome.tabs.create({
+        url: "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent),
+        index: settings.openNextToCurrent ? sender.tab.index + 1 : undefined,
+      });
     });
   }
 });
