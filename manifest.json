@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Markdown Clipper",
+  "version": "1.0.0",
+  "description": "Extract main webpage content and convert to Markdown.",
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Clip page as Markdown"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+M"
+      },
+      "description": "Extract page content to Markdown"
+    }
+  },
+  "web_accessible_resources": [{
+    "resources": [
+      "turndown-plugin-gfm.js",
+      "contentScript.js"
+    ],
+    "matches": [ "<all_urls>" ]
+  }]
+}
