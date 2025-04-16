@@ -26,6 +26,7 @@ import Defuddle from "defuddle";
   const titleText = result.title || document.title || "";
   const authorText = result.author || "";
   const dateText = result.published || "";
+  const urlText = document.URL;
 
   // Initialize Turndown (Markdown converter)
   const turndownService = new TurndownService({
@@ -58,18 +59,54 @@ import Defuddle from "defuddle";
     markdownBody = ""; // fallback to empty
   }
 
-  // Prepare YAML frontmatter
-  function escapeYaml(str) {
-    return str.replace(/\n/g, " ").replace(/"/g, '\\"');
-  }
-  let frontmatter = "---\n";
-  if (titleText) frontmatter += `title: "${escapeYaml(titleText)}"\n`;
-  if (authorText) frontmatter += `author: "${escapeYaml(authorText)}"\n`;
-  if (dateText) frontmatter += `date: "${escapeYaml(dateText)}"\n`;
-  frontmatter += "---\n\n";
+  // Get user preferences
+  chrome.storage.sync.get(
+    {
+      includeTitle: true,
+      includeUrl: true,
+      includeAuthor: true,
+      includeDate: false,
+    },
+    function (settings) {
+      let fullMarkdown = "";
 
-  const fullMarkdown = frontmatter + markdownBody;
+      // Check if any metadata fields are enabled
+      const hasMetadata =
+        settings.includeTitle ||
+        settings.includeUrl ||
+        settings.includeAuthor ||
+        settings.includeDate;
 
-  // Send the markdown result back to the background script
-  chrome.runtime.sendMessage({ type: "markdownResult", text: fullMarkdown });
+      if (hasMetadata) {
+        // Prepare YAML frontmatter
+        function escapeYaml(str) {
+          return str.replace(/\n/g, " ").replace(/"/g, '\\"');
+        }
+        let frontmatter = "---\n";
+        if (settings.includeTitle && titleText) {
+          frontmatter += `title: "${escapeYaml(titleText)}"\n`;
+        }
+        if (settings.includeUrl && urlText) {
+          frontmatter += `url: "${escapeYaml(urlText)}"\n`;
+        }
+        if (settings.includeAuthor && authorText) {
+          frontmatter += `author: "${escapeYaml(authorText)}"\n`;
+        }
+        if (settings.includeDate && dateText) {
+          frontmatter += `date: "${escapeYaml(dateText)}"\n`;
+        }
+        frontmatter += "---\n\n";
+
+        fullMarkdown = frontmatter + markdownBody;
+      } else {
+        fullMarkdown = markdownBody;
+      }
+
+      // Send the markdown result back to the background script
+      chrome.runtime.sendMessage({
+        type: "markdownResult",
+        text: fullMarkdown,
+      });
+    }
+  );
 })();

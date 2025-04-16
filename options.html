@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Markdown Clipper Options</title>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        padding: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .option-row {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+      }
+      label {
+        margin-left: 10px;
+        flex-grow: 1;
+      }
+      h1 {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+      }
+      .status {
+        margin-top: 15px;
+        color: green;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+      .status.visible {
+        opacity: 1;
+      }
+      .metadata-section {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+      }
+      .metadata-section h2 {
+        font-size: 1rem;
+        margin: 0 0 15px 0;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Markdown Clipper Settings</h1>
+
+    <div class="metadata-section">
+      <h2>Metadata Fields</h2>
+      <div class="option-row">
+        <input type="checkbox" id="include-title" name="include-title" />
+        <label for="include-title">Title</label>
+      </div>
+      <div class="option-row">
+        <input type="checkbox" id="include-url" name="include-url" />
+        <label for="include-url">URL</label>
+      </div>
+      <div class="option-row">
+        <input type="checkbox" id="include-author" name="include-author" />
+        <label for="include-author">Author</label>
+      </div>
+      <div class="option-row">
+        <input type="checkbox" id="include-date" name="include-date" />
+        <label for="include-date">Date</label>
+      </div>
+    </div>
+
+    <div id="status" class="status">Settings saved!</div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

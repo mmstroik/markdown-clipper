@@ -87,12 +87,14 @@ module.exports = (env, argv) => {
           { from: "manifest.json", to: "manifest.json" },
           { from: "turndown-plugin-gfm.js", to: "turndown-plugin-gfm.js" },
           { from: "icons", to: "icons" },
+          { from: "options.html", to: "options.html" },
+          { from: "options.js", to: "options.js" },
         ],
       }),
       ...(isProduction
         ? [
             new ZipPlugin({
-              path: "builds",
+              path: path.resolve(__dirname, "builds"),
               filename: `markdown-clipper-${package.version}.zip`,
             }),
           ]

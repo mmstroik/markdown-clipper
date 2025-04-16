@@ -9,6 +9,19 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
+// Open options page when extension is installed/updated
+chrome.runtime.onInstalled.addListener((details) => {
+  // Initialize default settings if this is a first install
+  if (details.reason === "install") {
+    chrome.storage.sync.set({
+      includeTitle: true,
+      includeUrl: true,
+      includeAuthor: true,
+      includeDate: false,
+    });
+  }
+});
+
 // Listen for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender) => {
   if (message.type === "markdownResult" && message.text) {
