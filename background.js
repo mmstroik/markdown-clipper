@@ -18,6 +18,7 @@ chrome.runtime.onInstalled.addListener((details) => {
       includeUrl: true,
       includeAuthor: true,
       includeDate: false,
+      preserveTableLinebreaks: false,
     });
   }
 });

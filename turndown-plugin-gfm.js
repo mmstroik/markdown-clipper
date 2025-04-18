@@ -69,12 +69,27 @@
     tableCell: {
       filter: ["th", "td"],
       replacement: function (content, node) {
-        // Clean up the content: remove newlines, trim whitespace, escape pipes
-        var cleanedContent = content
-          .replace(/\n+/g, " ") // Replace one or more newlines with a single space
-          .replace(/\|/g, "\\|") // Escape pipe characters
-          .trim(); // Remove leading/trailing whitespace
-        return cell(cleanedContent, node); // Use the cleaned content
+        // Access settings from global variable if available
+        var preserveLinebreaks =
+          window.markdownClipperSettings &&
+          window.markdownClipperSettings.preserveTableLinebreaks;
+
+        // Clean up the content based on the setting
+        var cleanedContent;
+        if (preserveLinebreaks) {
+          cleanedContent = content
+            .replace(/^\n+|\n+$/g, "") // Remove leading/trailing newlines first
+            .replace(/\n+/g, "<br>") // Replace internal newlines with <br> tags
+            .replace(/\|/g, "\\|") // Escape pipe characters
+            .trim(); // Remove any remaining whitespace
+        } else {
+          cleanedContent = content
+            .replace(/\n+/g, " ") // Replace newlines with spaces
+            .replace(/\|/g, "\\|") // Escape pipe characters
+            .trim(); // Remove leading/trailing whitespace
+        }
+
+        return cell(cleanedContent, node);
       },
     },
     tableRow: {

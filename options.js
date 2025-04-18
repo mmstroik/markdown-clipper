@@ -6,6 +6,9 @@ function saveOptions() {
     includeAuthor: document.getElementById("include-author").checked,
     includeDate: document.getElementById("include-date").checked,
     openNextToCurrent: document.getElementById("open-next-to-current").checked,
+    preserveTableLinebreaks: document.getElementById(
+      "preserve-table-linebreaks"
+    ).checked,
   };
 
   chrome.storage.sync.set(settings, function () {
@@ -29,6 +32,7 @@ function restoreOptions() {
       includeAuthor: true,
       includeDate: false,
       openNextToCurrent: true,
+      preserveTableLinebreaks: false,
     },
     function (items) {
       document.getElementById("include-title").checked = items.includeTitle;
@@ -37,6 +41,8 @@ function restoreOptions() {
       document.getElementById("include-date").checked = items.includeDate;
       document.getElementById("open-next-to-current").checked =
         items.openNextToCurrent;
+      document.getElementById("preserve-table-linebreaks").checked =
+        items.preserveTableLinebreaks;
     }
   );
 }
@@ -55,4 +61,7 @@ document
 document.getElementById("include-date").addEventListener("change", saveOptions);
 document
   .getElementById("open-next-to-current")
+  .addEventListener("change", saveOptions);
+document
+  .getElementById("preserve-table-linebreaks")
   .addEventListener("change", saveOptions);

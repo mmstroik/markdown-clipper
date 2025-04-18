@@ -50,56 +50,61 @@ import Defuddle from "defuddle";
     hasDate: !!dateText,
   });
 
-  // Initialize Turndown (Markdown converter)
-  console.log("Initializing Turndown service");
-  const turndownService = new TurndownService({
-    headingStyle: "atx",
-    hr: "---",
-    bulletListMarker: "-",
-    codeBlockStyle: "fenced",
-    fence: "```",
-    emDelimiter: "_",
-    strongDelimiter: "**",
-    linkStyle: "inlined",
-    linkReferenceStyle: "full",
-    preformattedCode: false, // we'll handle pre tags via plugin rules
-  });
-
-  // Apply GFM plugin rules (tables, task lists, code blocks)
-  if (typeof highlightedCodeBlock === "function") {
-    turndownService.use([highlightedCodeBlock, tables, taskListItems]);
-    console.log("Applied GFM plugins");
-  } else {
-    console.warn("GFM plugins not available");
-  }
-
-  // Remove any script/style elements content (just in case)
-  turndownService.remove(["script", "style"]);
-
-  // Convert extracted HTML to Markdown text
-  let markdownBody = "";
-  try {
-    markdownBody = turndownService.turndown(contentHtml);
-    console.log("Markdown conversion complete", {
-      markdownLength: markdownBody.length,
-      firstChars: markdownBody.substring(0, 100),
-    });
-  } catch (err) {
-    console.error("Turndown conversion error:", err);
-    markdownBody = ""; // fallback to empty
-  }
-
-  // Get user preferences
+  // Get user preferences first
   chrome.storage.sync.get(
     {
       includeTitle: true,
       includeUrl: true,
       includeAuthor: true,
       includeDate: false,
+      preserveTableLinebreaks: false,
     },
     function (settings) {
       console.log("User settings:", settings);
 
+      // Make settings available to the GFM plugin
+      window.markdownClipperSettings = settings;
+
+      // Initialize Turndown (Markdown converter)
+      console.log("Initializing Turndown service");
+      const turndownService = new TurndownService({
+        headingStyle: "atx",
+        hr: "---",
+        bulletListMarker: "-",
+        codeBlockStyle: "fenced",
+        fence: "```",
+        emDelimiter: "_",
+        strongDelimiter: "**",
+        linkStyle: "inlined",
+        linkReferenceStyle: "full",
+        preformattedCode: false, // we'll handle pre tags via plugin rules
+      });
+
+      // Apply GFM plugin rules (tables, task lists, code blocks)
+      if (typeof highlightedCodeBlock === "function") {
+        turndownService.use([highlightedCodeBlock, tables, taskListItems]);
+        console.log("Applied GFM plugins");
+      } else {
+        console.warn("GFM plugins not available");
+      }
+
+      // Remove any script/style elements content (just in case)
+      turndownService.remove(["script", "style"]);
+
+      // Convert extracted HTML to Markdown text
+      let markdownBody = "";
+      try {
+        markdownBody = turndownService.turndown(contentHtml);
+        console.log("Markdown conversion complete", {
+          markdownLength: markdownBody.length,
+          firstChars: markdownBody.substring(0, 100),
+        });
+      } catch (err) {
+        console.error("Turndown conversion error:", err);
+        markdownBody = ""; // fallback to empty
+      }
+
+      // Get user preferences
       let fullMarkdown = "";
 
       // Check if any metadata fields are enabled
