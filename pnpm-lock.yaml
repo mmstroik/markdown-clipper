@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       defuddle:
-        specifier: ^0.6.1
-        version: 0.6.1(jsdom@24.1.3)
+        specifier: ^0.6.2
+        version: 0.6.2(jsdom@24.1.3)
       turndown:
         specifier: ^7.2.0
         version: 7.2.0
@@ -301,8 +301,8 @@ packages:
   decimal.js@10.5.0:
     resolution: {integrity: sha512-8vDa8Qxvr/+d94hSh5P3IJwI5t8/c0KsMp+g8bNw9cY2icONa5aPfvKeieW1WlG0WQYwwhJ7mjui2xtiePQSXw==}
 
-  defuddle@0.6.1:
-    resolution: {integrity: sha512-jicsqVSKIJJ+wUaZ//6+EqPO36pxLguHeNOjaSRBWWvd83F1THnsAZXUUuumgRQwFZPJq22u1Cy7S+NIMzzcCg==}
+  defuddle@0.6.2:
+    resolution: {integrity: sha512-zhPxIMCm3SFB8gFQsVDqUGo45IIeWfGgdPN5Wc7NxznafhIsR0fqV7luHIeSFACs750QFKvt1BoSr3hcqs2Mig==}
     peerDependencies:
       jsdom: ^24.0.0
 
@@ -1169,7 +1169,7 @@ snapshots:
 
   decimal.js@10.5.0: {}
 
-  defuddle@0.6.1(jsdom@24.1.3):
+  defuddle@0.6.2(jsdom@24.1.3):
     dependencies:
       jsdom: 24.1.3
     optionalDependencies:
