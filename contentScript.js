@@ -3,19 +3,34 @@ import TurndownService from "turndown";
 import Defuddle from "defuddle";
 
 (async function () {
+  console.log("Content script started");
+
   // Only proceed if Defuddle and Turndown are loaded
   if (
     typeof Defuddle === "undefined" ||
     typeof TurndownService === "undefined"
   ) {
+    console.error("Required libraries not loaded:", {
+      defuddle: typeof Defuddle,
+      turndown: typeof TurndownService,
+    });
     return;
   }
 
   // Run Defuddle to extract main content and metadata
+  console.log("Initializing Defuddle parser");
   let defuddle = new Defuddle(document, { url: document.URL });
   let result;
   try {
     result = defuddle.parse();
+    console.log("Defuddle parse result:", {
+      hasContent: !!result.content,
+      contentLength: result.content?.length,
+      title: result.title,
+      author: result.author,
+      date: result.published,
+      content: result.content,
+    });
   } catch (err) {
     console.error("Defuddle parse error:", err);
     return;
@@ -28,7 +43,15 @@ import Defuddle from "defuddle";
   const dateText = result.published || "";
   const urlText = document.URL;
 
+  console.log("Extracted content stats:", {
+    contentHtmlLength: contentHtml.length,
+    titleLength: titleText.length,
+    hasAuthor: !!authorText,
+    hasDate: !!dateText,
+  });
+
   // Initialize Turndown (Markdown converter)
+  console.log("Initializing Turndown service");
   const turndownService = new TurndownService({
     headingStyle: "atx",
     hr: "---",
@@ -45,6 +68,9 @@ import Defuddle from "defuddle";
   // Apply GFM plugin rules (tables, task lists, code blocks)
   if (typeof highlightedCodeBlock === "function") {
     turndownService.use([highlightedCodeBlock, tables, taskListItems]);
+    console.log("Applied GFM plugins");
+  } else {
+    console.warn("GFM plugins not available");
   }
 
   // Remove any script/style elements content (just in case)
@@ -54,6 +80,10 @@ import Defuddle from "defuddle";
   let markdownBody = "";
   try {
     markdownBody = turndownService.turndown(contentHtml);
+    console.log("Markdown conversion complete", {
+      markdownLength: markdownBody.length,
+      firstChars: markdownBody.substring(0, 100),
+    });
   } catch (err) {
     console.error("Turndown conversion error:", err);
     markdownBody = ""; // fallback to empty
@@ -68,6 +98,8 @@ import Defuddle from "defuddle";
       includeDate: false,
     },
     function (settings) {
+      console.log("User settings:", settings);
+
       let fullMarkdown = "";
 
       // Check if any metadata fields are enabled
@@ -101,6 +133,12 @@ import Defuddle from "defuddle";
       } else {
         fullMarkdown = markdownBody;
       }
+
+      console.log("Final markdown stats:", {
+        totalLength: fullMarkdown.length,
+        hasFrontmatter: hasMetadata,
+        contentStartsAt: fullMarkdown.indexOf(markdownBody),
+      });
 
       // Send the markdown result back to the background script
       chrome.runtime.sendMessage({

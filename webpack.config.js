@@ -13,7 +13,7 @@ if (!fs.existsSync(buildsDir)) {
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production";
-  console.log("Build mode:", { env, argv, isProduction });
+  console.log(`Build mode: ${isProduction ? "production" : "development"}`);
 
   return {
     entry: {
@@ -37,16 +37,18 @@ module.exports = (env, argv) => {
     mode: isProduction ? "production" : "development",
     devtool: isProduction ? false : "inline-source-map",
     optimization: {
-      minimize: true,
+      minimize: isProduction,
       minimizer: [
         new TerserPlugin({
           terserOptions: {
             ecma: 2020,
             module: true,
             compress: {
-              drop_console: true,
-              drop_debugger: true,
-              pure_funcs: ["console.log", "console.info", "console.debug"],
+              drop_console: isProduction,
+              drop_debugger: isProduction,
+              pure_funcs: isProduction
+                ? ["console.log", "console.info", "console.debug"]
+                : [],
               passes: 3,
               unsafe_math: true,
               unsafe_methods: true,
@@ -63,7 +65,7 @@ module.exports = (env, argv) => {
               },
             },
             format: {
-              comments: false,
+              comments: !isProduction,
               ecma: 2020,
             },
           },
@@ -74,8 +76,8 @@ module.exports = (env, argv) => {
       sideEffects: true,
       providedExports: true,
       innerGraph: true,
-      mangleExports: true,
-      concatenateModules: true,
+      mangleExports: isProduction,
+      concatenateModules: isProduction,
     },
     resolve: {
       extensions: [".js", ".json"],
