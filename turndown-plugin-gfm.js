@@ -69,7 +69,12 @@
     tableCell: {
       filter: ["th", "td"],
       replacement: function (content, node) {
-        return cell(content, node);
+        // Clean up the content: remove newlines, trim whitespace, escape pipes
+        var cleanedContent = content
+          .replace(/\n+/g, " ") // Replace one or more newlines with a single space
+          .replace(/\|/g, "\\|") // Escape pipe characters
+          .trim(); // Remove leading/trailing whitespace
+        return cell(cleanedContent, node); // Use the cleaned content
       },
     },
     tableRow: {
@@ -120,6 +125,7 @@
   // Plugin: tables (convert HTML tables to Markdown tables)
   function tables(turndownService) {
     // Keep tables without a header row intact (do not convert those)
+    /* // Commented out to allow conversion of tables without standard headers
     turndownService.keep(function (node) {
       return (
         node.nodeName === "TABLE" &&
@@ -127,6 +133,7 @@
         !isHeadingRow(node.rows[0])
       );
     });
+    */
     // Add all table conversion rules
     for (var ruleName in tableRules) {
       turndownService.addRule(ruleName, tableRules[ruleName]);
