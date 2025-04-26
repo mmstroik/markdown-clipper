@@ -50,7 +50,7 @@
         return "\n" + content + "\n";
       },
     });
-    
+
     // Transformed code blocks container
     turndownService.addRule("transformedCodeBlocks", {
       filter: function (node) {
@@ -64,7 +64,7 @@
         return content;
       },
     });
-    
+
     // Rule for CodeTabs (original structure) - only as a fallback
     turndownService.addRule("codeTabs", {
       filter: function (node) {
@@ -78,37 +78,37 @@
       replacement: function (content, node, options) {
         // Fallback handler for any CodeTabs that weren't pre-processed
         var codeBlocks = [];
-        var codeElements = node.querySelectorAll('code[data-lang]');
-        
+        var codeElements = node.querySelectorAll("code[data-lang]");
+
         if (codeElements.length === 0) return content; // No code found
-        
+
         for (var i = 0; i < codeElements.length; i++) {
           var codeEl = codeElements[i];
-          var language = codeEl.getAttribute('data-lang') || '';
+          var language = codeEl.getAttribute("data-lang") || "";
           // Get the actual text content, not the HTML with spans
-          var codeText = codeEl.textContent || '';
-          
+          var codeText = codeEl.textContent || "";
+
           // Check if it has a name (tab name) attribute
-          var tabName = codeEl.getAttribute('name');
-          var tabLabel = tabName ? '(' + tabName + ')' : '';
-          
+          var tabName = codeEl.getAttribute("name");
+          var tabLabel = tabName ? "(" + tabName + ")" : "";
+
           // Add this code block
           codeBlocks.push(
             "\n\n" +
-            options.fence + 
-            language.toLowerCase() + 
-            tabLabel +
-            "\n" +
-            codeText +
-            "\n" +
-            options.fence
+              options.fence +
+              language.toLowerCase() +
+              tabLabel +
+              "\n" +
+              codeText +
+              "\n" +
+              options.fence
           );
         }
-        
+
         return codeBlocks.join("\n\n") + "\n\n";
       },
     });
-    
+
     // Generic pre>code blocks - expanded to handle our transformed code blocks
     turndownService.addRule("preCode", {
       filter: function (node) {
@@ -119,34 +119,35 @@
         );
       },
       replacement: function (content, node, options) {
-        var language = '';
-        var tabName = '';
+        var language = "";
+        var tabName = "";
         var codeNode = node.firstChild;
-        
+
         // Try to determine language from class
         if (codeNode.className) {
-          var classMatch = codeNode.className.match(/language-(\w+)/) || 
-                           codeNode.className.match(/lang-(\w+)/) ||
-                           codeNode.className.match(/rdmd-code lang-(\w+)/);
+          var classMatch =
+            codeNode.className.match(/language-(\w+)/) ||
+            codeNode.className.match(/lang-(\w+)/) ||
+            codeNode.className.match(/rdmd-code lang-(\w+)/);
           if (classMatch) language = classMatch[1];
         }
-        
+
         // Or from data-lang attribute
         if (!language && codeNode.getAttribute) {
-          language = codeNode.getAttribute('data-lang') || '';
+          language = codeNode.getAttribute("data-lang") || "";
         }
-        
+
         // Get tab name if available
         if (codeNode.getAttribute) {
-          tabName = codeNode.getAttribute('data-tab-name') || '';
+          tabName = codeNode.getAttribute("data-tab-name") || "";
         }
-        
+
         // Add tab name as a comment in the language line if present
         var languageLine = language;
         if (tabName) {
-          languageLine += ' # ' + tabName;
+          languageLine += " # " + tabName;
         }
-        
+
         return (
           "\n\n" +
           options.fence +
