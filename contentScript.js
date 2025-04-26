@@ -16,66 +16,71 @@ import Defuddle from "defuddle";
     });
     return;
   }
-  
+
   // Pre-process: Transform CodeTabs into standard code blocks before extraction
   try {
     console.log("Pre-processing CodeTabs before extraction");
-    
+
     // Find all CodeTabs elements
-    const codeTabElements = document.querySelectorAll('.CodeTabs');
+    const codeTabElements = document.querySelectorAll(".CodeTabs");
     if (codeTabElements.length > 0) {
-      console.log(`Found ${codeTabElements.length} CodeTabs elements to transform`);
-      
+      console.log(
+        `Found ${codeTabElements.length} CodeTabs elements to transform`
+      );
+
       // Process each CodeTabs element
       codeTabElements.forEach((codeTab) => {
         // Create a container to hold transformed code blocks
-        const codeBlocksContainer = document.createElement('div');
-        codeBlocksContainer.className = 'transformed-code-blocks';
-        
+        const codeBlocksContainer = document.createElement("div");
+        codeBlocksContainer.className = "transformed-code-blocks";
+
         // Find all code elements within the tabs
-        const codeElements = codeTab.querySelectorAll('code[data-lang]');
-        
+        const codeElements = codeTab.querySelectorAll("code[data-lang]");
+
         if (codeElements.length > 0) {
           codeElements.forEach((codeEl) => {
-            const language = codeEl.getAttribute('data-lang') || '';
-            const tabName = codeEl.getAttribute('name') || '';
-            const codeText = codeEl.textContent || '';
-            
+            const language = codeEl.getAttribute("data-lang") || "";
+            const tabName = codeEl.getAttribute("name") || "";
+            const codeText = codeEl.textContent || "";
+
             // Create a standard pre+code structure that Defuddle will recognize
-            const preElement = document.createElement('pre');
-            const codeElement = document.createElement('code');
-            
+            const preElement = document.createElement("pre");
+            const codeElement = document.createElement("code");
+
             // Apply language class in a format Defuddle will recognize
             codeElement.className = `language-${language.toLowerCase()}`;
             if (tabName) {
-              codeElement.setAttribute('data-tab-name', tabName);
+              codeElement.setAttribute("data-tab-name", tabName);
             }
-            
+
             // Set the code content
             codeElement.textContent = codeText;
-            
+
             // Add a header comment if there's a tab name
             if (tabName) {
-              const headerDiv = document.createElement('div');
-              headerDiv.className = 'code-tab-header';
+              const headerDiv = document.createElement("div");
+              headerDiv.className = "code-tab-header";
               headerDiv.textContent = `// ${tabName}`;
               codeBlocksContainer.appendChild(headerDiv);
             }
-            
+
             // Assemble the code block
             preElement.appendChild(codeElement);
             codeBlocksContainer.appendChild(preElement);
           });
-          
+
           // Insert the transformed code blocks immediately after the original CodeTabs
-          codeTab.parentNode.insertBefore(codeBlocksContainer, codeTab.nextSibling);
-          
+          codeTab.parentNode.insertBefore(
+            codeBlocksContainer,
+            codeTab.nextSibling
+          );
+
           // Don't remove the original - just make it have a special class
           // so we know it was processed but keep the original structure intact
-          codeTab.classList.add('md-clipper-processed');
+          codeTab.classList.add("md-clipper-processed");
         }
       });
-      
+
       console.log("Finished transforming CodeTabs elements");
     }
   } catch (err) {
@@ -104,7 +109,7 @@ import Defuddle from "defuddle";
 
   // Get extracted HTML content and metadata
   let contentHtml = result.content || "";
-  
+
   const titleText = result.title || document.title || "";
   const authorText = result.author || "";
   const dateText = result.published || "";
