@@ -1,6 +1,10 @@
 // Save options to Chrome storage
 function saveOptions() {
+  const parserChoice = document.querySelector(
+    'input[name="parser"]:checked'
+  ).value;
   const settings = {
+    parserChoice: parserChoice,
     includeTitle: document.getElementById("include-title").checked,
     includeUrl: document.getElementById("include-url").checked,
     includeAuthor: document.getElementById("include-author").checked,
@@ -25,8 +29,9 @@ function saveOptions() {
 // Load saved options from Chrome storage
 function restoreOptions() {
   chrome.storage.sync.get(
-    // Default values: title, url, and author enabled, date disabled, open next to current enabled
+    // Default values
     {
+      parserChoice: "readability", // Default to Readability
       includeTitle: true,
       includeUrl: true,
       includeAuthor: true,
@@ -35,6 +40,13 @@ function restoreOptions() {
       preserveTableLinebreaks: false,
     },
     function (items) {
+      // Set the correct radio button
+      if (items.parserChoice === "defuddle") {
+        document.getElementById("parser-defuddle").checked = true;
+      } else {
+        document.getElementById("parser-readability").checked = true; // Default case
+      }
+
       document.getElementById("include-title").checked = items.includeTitle;
       document.getElementById("include-url").checked = items.includeUrl;
       document.getElementById("include-author").checked = items.includeAuthor;
@@ -50,7 +62,10 @@ function restoreOptions() {
 // Initialize the options page
 document.addEventListener("DOMContentLoaded", restoreOptions);
 
-// Add change listeners to all checkboxes
+// Add change listeners to all checkboxes and radio buttons
+document.querySelectorAll('input[name="parser"]').forEach((radio) => {
+  radio.addEventListener("change", saveOptions);
+});
 document
   .getElementById("include-title")
   .addEventListener("change", saveOptions);

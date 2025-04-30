@@ -50,6 +50,29 @@
     <h1>Markdown Clipper Settings</h1>
 
     <div class="metadata-section">
+      <h2>Parser Engine</h2>
+      <div class="option-row">
+        <input
+          type="radio"
+          id="parser-readability"
+          name="parser"
+          value="readability"
+          checked
+        />
+        <label for="parser-readability">Readability (Default)</label>
+      </div>
+      <div class="option-row">
+        <input
+          type="radio"
+          id="parser-defuddle"
+          name="parser"
+          value="defuddle"
+        />
+        <label for="parser-defuddle">Defuddle (Alternative)</label>
+      </div>
+    </div>
+
+    <div class="metadata-section">
       <h2>Metadata Fields</h2>
       <div class="option-row">
         <input type="checkbox" id="include-title" name="include-title" />

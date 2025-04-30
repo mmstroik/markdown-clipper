@@ -6,6 +6,7 @@ Clone and build or download from the [Chrome Web Store](https://chromewebstore.g
 
 ## Options
 
+- **Parser Engine**: Choose between 'Readability' (default) and 'Defuddle' for extracting page content. Readability is generally recommended, but Defuddle might perform better on certain complex pages or those with non-standard article structures.
 - **Metadata**: Control which frontmatter fields to include (title, URL, author, date)
 - **Tab behavior**: Choose to open output in adjacent tab or at end of tab bar
 - **Table formatting**: Preserve line breaks within table cells using HTML <br> tags
