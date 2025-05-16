@@ -150,9 +150,6 @@ function convertToMarkdown(
   dateText,
   urlText
 ) {
-  // Make settings available to the GFM plugin
-  window.markdownClipperSettings = settings;
-
   // Initialize Turndown (Markdown converter)
   console.log("Initializing Turndown service");
   const turndownService = new TurndownService({
@@ -169,11 +166,27 @@ function convertToMarkdown(
   });
 
   // Apply GFM plugin rules (tables, task lists, code blocks)
-  if (typeof highlightedCodeBlock === "function") {
-    turndownService.use([highlightedCodeBlock, tables, taskListItems]);
-    console.log("Applied GFM plugins");
+  // Ensure all plugin functions are available on window before attempting to use them
+  if (
+    typeof window.highlightedCodeBlock === "function" &&
+    typeof window.tables === "function" &&
+    typeof window.taskListItems === "function"
+  ) {
+    // Wrapper for the tables plugin to pass settings
+    const tablesPluginWithSettings = (service) => {
+      window.tables(service, settings); // Pass settings to the tables plugin
+    };
+
+    turndownService.use([
+      window.highlightedCodeBlock, // Assumes this doesn't need settings
+      tablesPluginWithSettings,
+      window.taskListItems, // Assumes this doesn't need settings
+    ]);
+    console.log("Applied GFM plugins (tables with settings).");
   } else {
-    console.warn("GFM plugins not available");
+    console.warn(
+      "GFM plugins (highlightedCodeBlock, tables, or taskListItems) not fully available on window. Some GFM features might be missing."
+    );
   }
 
   // Remove any script/style elements content (just in case)
@@ -203,7 +216,7 @@ function convertToMarkdown(
   if (hasMetadata) {
     function escapeYaml(str) {
       // Basic escaping, might need refinement
-      return str ? str.replace(/\n/g, " ").replace(/"/g, '"') : "";
+      return str ? str.replace(/\n/g, " ").replace(/"/g, '\\"') : ""; // Corrected quote escaping
     }
 
     fullMarkdown += "---\n";
