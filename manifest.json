@@ -37,15 +37,5 @@
       "description": "Extract page content to Markdown"
     }
   },
-  "web_accessible_resources": [{
-    "resources": [
-      "turndown-gfm.js",
-      "contentScript.js",
-      "copyHelper.js",
-      "output.html",
-      "output.css",
-      "output.js"
-    ],
-    "matches": [ "<all_urls>" ]
-  }]
+  "web_accessible_resources": []
 }
