@@ -87,7 +87,7 @@ module.exports = (env, argv) => {
       new CopyPlugin({
         patterns: [
           { from: "manifest.json", to: "manifest.json" },
-          { from: "turndown-plugin-gfm.js", to: "turndown-plugin-gfm.js" },
+          { from: "turndown-gfm.js", to: "turndown-gfm.js" },
           { from: "copyHelper.js", to: "copyHelper.js" },
           { from: "icons", to: "icons" },
           { from: "options.html", to: "options.html" },

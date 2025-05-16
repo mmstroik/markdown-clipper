@@ -74,18 +74,13 @@ body {
   height: 100vh; /* Full height for single view pre */
 }
 
-.dual-view-container .content-wrapper {
-   /* flex: 1 will handle height */
-}
 
 pre {
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
-  padding: 0; /* Padding handled by content-wrapper */
+  padding: 0;
   box-sizing: border-box;
-  /* height: 100vh; Remove as wrapper handles height now */
-  /* overflow-y: auto; Remove as wrapper handles scroll now */
 }
 
 @media (prefers-color-scheme: dark) {

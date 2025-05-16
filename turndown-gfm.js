@@ -1,6 +1,5 @@
 /**
- * Turndown Plugin GFM - Adds GitHub Flavored Markdown support (tables, task lists, code blocks).
- * Derived from turndown-plugin-gfm.
+ * Customized Turndown GFM - Adds GitHub Flavored Markdown support (tables, task lists, code blocks).
  */
 (function () {
   // Utility regex and helpers for code block conversion

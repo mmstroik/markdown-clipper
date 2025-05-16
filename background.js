@@ -4,7 +4,7 @@ chrome.action.onClicked.addListener(async (tab) => {
   if (tab.id) {
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      files: ["turndown-plugin-gfm.js", "contentScript.js"],
+      files: ["turndown-gfm.js", "contentScript.js"],
     });
   }
 });
