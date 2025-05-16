@@ -1,6 +1,5 @@
 // Background script (service worker)
 chrome.action.onClicked.addListener(async (tab) => {
-  // Inject content scripts into the active tab
   if (tab.id) {
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -9,9 +8,7 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
-// Open options page when extension is installed/updated
 chrome.runtime.onInstalled.addListener((details) => {
-  // Initialize default settings if this is a first install
   if (details.reason === "install") {
     chrome.storage.sync.set({
       includeTitle: true,
@@ -50,8 +47,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const outputPageUrl = chrome.runtime.getURL("output.html");
     const params = new URLSearchParams();
     params.append("viewType", "dual");
-    params.append("text1", message.readabilityText); // Raw text
-    params.append("text2", message.defuddleText); // Raw text
+    params.append("text1", message.readabilityText);
+    params.append("text2", message.defuddleText);
 
     const fullUrl = `${outputPageUrl}?${params.toString()}`;
 

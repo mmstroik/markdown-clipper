@@ -1,5 +1,3 @@
-// copyHelper.js - Used in output.html to handle copy functionality
-
 function setupCopyButtonListener(buttonId, contentId) {
   const button = document.getElementById(buttonId);
   const contentElement = document.getElementById(contentId);
@@ -78,8 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setupCount++;
       }
     } else {
-      // Optional: log if a potential pair is not found, e.g., if 'content' exists but 'copyBtnSingle' doesn't
-      // This might be too verbose if elements are intentionally absent for a view type.
     }
   });
 

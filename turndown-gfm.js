@@ -1,6 +1,3 @@
-/**
- * Customized Turndown GFM - Adds GitHub Flavored Markdown support (tables, task lists, code blocks).
- */
 (function () {
   // Utility regex and helpers for code block conversion
   var highlightRegExp = /highlight-(?:text|source)-([a-z0-9]+)/;

@@ -1,4 +1,3 @@
-// Save options to Chrome storage
 function saveOptions() {
   const parserChoice = document.querySelector(
     'input[name="parser"]:checked'
@@ -26,12 +25,10 @@ function saveOptions() {
   });
 }
 
-// Load saved options from Chrome storage
 function restoreOptions() {
   chrome.storage.sync.get(
-    // Default values
     {
-      parserChoice: "readability", // Default to Readability
+      parserChoice: "readability",
       includeTitle: true,
       includeUrl: true,
       includeAuthor: true,
@@ -46,7 +43,7 @@ function restoreOptions() {
       } else if (items.parserChoice === "both") {
         document.getElementById("parser-both").checked = true;
       } else {
-        document.getElementById("parser-readability").checked = true; // Default case
+        document.getElementById("parser-readability").checked = true;
       }
 
       document.getElementById("include-title").checked = items.includeTitle;
@@ -61,10 +58,8 @@ function restoreOptions() {
   );
 }
 
-// Initialize the options page
 document.addEventListener("DOMContentLoaded", restoreOptions);
 
-// Add change listeners to all checkboxes and radio buttons
 document.querySelectorAll('input[name="parser"]').forEach((radio) => {
   radio.addEventListener("change", saveOptions);
 });
