@@ -7,9 +7,7 @@
   var indexOf = Array.prototype.indexOf;
   var every = Array.prototype.every;
 
-  // Plugin: convert highlighted code blocks (e.g., GitHub or Prism highlight wrappers)
   function highlightedCodeBlock(turndownService) {
-    // First rule: Standard highlighted code blocks
     turndownService.addRule("highlightedCodeBlock", {
       filter: function (node) {
         var firstChild = node.firstChild;
@@ -36,7 +34,6 @@
       },
     });
 
-    // Next rule: Code tab headers
     turndownService.addRule("codeTabHeader", {
       filter: function (node) {
         return (
@@ -45,12 +42,10 @@
         );
       },
       replacement: function (content, node) {
-        // The content is already prepared as a comment (e.g., "// Output")
         return "\n" + content + "\n";
       },
     });
 
-    // Transformed code blocks container
     turndownService.addRule("transformedCodeBlocks", {
       filter: function (node) {
         return (
@@ -58,7 +53,6 @@
           (node.className || "").includes("transformed-code-blocks")
         );
       },
-      // Let the individual pre/code elements be handled by the preCode rule
       replacement: function (content) {
         return content;
       },
@@ -87,11 +81,9 @@
           // Get the actual text content, not the HTML with spans
           var codeText = codeEl.textContent || "";
 
-          // Check if it has a name (tab name) attribute
           var tabName = codeEl.getAttribute("name");
           var tabLabel = tabName ? "(" + tabName + ")" : "";
 
-          // Add this code block
           codeBlocks.push(
             "\n\n" +
               options.fence +
@@ -108,7 +100,6 @@
       },
     });
 
-    // Generic pre>code blocks - expanded to handle our transformed code blocks
     turndownService.addRule("preCode", {
       filter: function (node) {
         return (
@@ -117,12 +108,11 @@
           node.firstChild.nodeName === "CODE"
         );
       },
-      replacement: function (content, node, options) {
+      replacement: function (_, node, options) {
         var language = "";
         var tabName = "";
         var codeNode = node.firstChild;
 
-        // Try to determine language from class
         if (codeNode.className) {
           var classMatch =
             codeNode.className.match(/language-(\w+)/) ||
@@ -193,12 +183,8 @@
     tableCell: {
       filter: ["th", "td"],
       replacement: function (content, node) {
-        // Access settings from global variable if available
-        var preserveLinebreaks =
-          window.markdownClipperSettings &&
-          window.markdownClipperSettings.preserveTableLinebreaks;
+        var preserveLinebreaks = settings && settings.preserveTableLinebreaks;
 
-        // Clean up the content based on the setting
         var cleanedContent;
         if (preserveLinebreaks) {
           cleanedContent = content
@@ -234,13 +220,11 @@
             borderCells += cell(border, node.childNodes[i]);
           }
         }
-        // Output the row and optional header separator
         return "\n" + content + (borderCells ? "\n" + borderCells : "");
       },
     },
     table: {
       filter: function (node) {
-        // Only convert tables with a heading row
         return (
           node.nodeName === "TABLE" &&
           node.rows.length > 0 &&
@@ -248,7 +232,6 @@
         );
       },
       replacement: function (content) {
-        // Remove extra blank lines and wrap table in newlines
         content = content.replace("\n\n", "\n");
         return "\n\n" + content + "\n\n";
       },
@@ -261,25 +244,12 @@
     },
   };
 
-  // Plugin: tables (convert HTML tables to Markdown tables)
   function tables(turndownService) {
-    // Keep tables without a header row intact (do not convert those)
-    /* // Commented out to allow conversion of tables without standard headers
-    turndownService.keep(function (node) {
-      return (
-        node.nodeName === "TABLE" &&
-        node.rows.length > 0 &&
-        !isHeadingRow(node.rows[0])
-      );
-    });
-    */
-    // Add all table conversion rules
     for (var ruleName in tableRules) {
       turndownService.addRule(ruleName, tableRules[ruleName]);
     }
   }
 
-  // Plugin: task list items (convert <input type="checkbox"> in <li> to [x] or [ ])
   function taskListItems(turndownService) {
     turndownService.addRule("taskListItems", {
       filter: function (node) {
