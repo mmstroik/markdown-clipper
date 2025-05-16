@@ -1,0 +1,104 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex; /* For dual pane */
+  height: 100vh;
+  overflow: hidden; /* For dual pane */
+  font-size: 16px; /* Adjusted base font size */
+}
+
+#main-container.single-view-container {
+  width: 100%;
+  height: 100vh;
+  position: relative; /* For copy button positioning */
+}
+
+#main-container.dual-view-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+.column {
+  flex: 1; display: flex; flex-direction: column;
+  box-sizing: border-box; border-right: 1px solid #ccc; position: relative;
+}
+.column:last-child { border-right: none; }
+
+.column-header {
+  background: #f5f5f5; padding: 10px; border-bottom: 1px solid #ccc;
+  display: flex; justify-content: center; align-items: center;
+  height: 40px; /* Fixed height for header */
+  box-sizing: border-box;
+}
+
+.column-title { font-weight: bold; }
+
+.copy-btn {
+  position: absolute;
+  padding: 8px 12px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 10;
+}
+
+/* Single View Copy Button */
+#main-container.single-view-container > .copy-btn {
+  top: 10px;
+  right: 20px; /* Increased right padding */
+}
+
+/* Dual View Copy Button */
+.column > .copy-btn {
+  top: 50px; /* Adjusted to be below the fixed header */
+  right: 20px; /* Increased right padding */
+}
+
+.copy-btn:hover { background: #3a80d2; }
+.copy-btn:active { background: #2a70c2; }
+
+.content-wrapper {
+  flex: 1; 
+  overflow-y: auto; 
+  padding: 15px;
+  padding-top: 15px; /* Default padding */
+  box-sizing: border-box;
+}
+
+#main-container.single-view-container .content-wrapper {
+  height: 100vh; /* Full height for single view pre */
+}
+
+.dual-view-container .content-wrapper {
+   /* flex: 1 will handle height */
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  padding: 0; /* Padding handled by content-wrapper */
+  box-sizing: border-box;
+  /* height: 100vh; Remove as wrapper handles height now */
+  /* overflow-y: auto; Remove as wrapper handles scroll now */
+}
+
+@media (prefers-color-scheme: dark) {
+  .column-header { background: #333; border-bottom: 1px solid #555; }
+  .column { border-right: 1px solid #555; }
+  body {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+  }
+  .copy-btn {
+    background: #007acc;
+    color: white;
+  }
+  .copy-btn:hover { background: #005fa3; }
+  .copy-btn:active { background: #004c82; }
+} 

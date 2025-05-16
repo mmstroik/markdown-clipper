@@ -43,6 +43,8 @@ function restoreOptions() {
       // Set the correct radio button
       if (items.parserChoice === "defuddle") {
         document.getElementById("parser-defuddle").checked = true;
+      } else if (items.parserChoice === "both") {
+        document.getElementById("parser-both").checked = true;
       } else {
         document.getElementById("parser-readability").checked = true; // Default case
       }

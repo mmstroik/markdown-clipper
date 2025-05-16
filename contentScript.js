@@ -88,6 +88,146 @@ function cleanupTemporaryElements(elements) {
   }
 }
 
+// Function to parse content using Readability
+async function parseWithReadability() {
+  console.log("Using Readability parser.");
+
+  // Clone the document for Readability
+  const documentClone = document.cloneNode(true);
+
+  // Run Readability
+  console.log("Initializing Readability parser");
+  const reader = new Readability(documentClone);
+  const result = reader.parse();
+  console.log("Readability parse result:", {
+    hasContent: !!result.content,
+    contentLength: result.content?.length,
+    title: result.title,
+    author: result.byline, // Readability uses 'byline'
+    date: result.siteName, // Readability uses 'siteName' (no reliable date)
+  });
+
+  return result;
+}
+
+// Function to parse content using Defuddle
+async function parseWithDefuddle() {
+  console.log("Using Defuddle parser.");
+
+  // Pre-process CodeTabs specifically for Defuddle
+  const temporaryElements = preprocessCodeTabsForDefuddle();
+
+  try {
+    // Run Defuddle
+    console.log("Initializing Defuddle parser");
+    let defuddle = new Defuddle(document, { url: document.URL });
+    const result = defuddle.parse();
+    console.log("Defuddle parse result:", {
+      hasContent: !!result.content,
+      contentLength: result.content?.length,
+      title: result.title,
+      author: result.author,
+      date: result.published, // Defuddle uses 'published'
+    });
+
+    // Map Defuddle result fields to common structure
+    result.byline = result.author; // Map author to byline
+    result.siteName = result.published; // Use published date as siteName equivalent (for consistency)
+
+    return result;
+  } finally {
+    // Clean up temporary DOM elements
+    cleanupTemporaryElements(temporaryElements);
+  }
+}
+
+// Function to convert HTML content to Markdown
+function convertToMarkdown(
+  contentHtml,
+  settings,
+  titleText,
+  authorText,
+  dateText,
+  urlText
+) {
+  // Make settings available to the GFM plugin
+  window.markdownClipperSettings = settings;
+
+  // Initialize Turndown (Markdown converter)
+  console.log("Initializing Turndown service");
+  const turndownService = new TurndownService({
+    headingStyle: "atx",
+    hr: "---",
+    bulletListMarker: "-",
+    codeBlockStyle: "fenced",
+    fence: "```",
+    emDelimiter: "_",
+    strongDelimiter: "**",
+    linkStyle: "inlined",
+    linkReferenceStyle: "full",
+    preformattedCode: false, // we'll handle pre tags via plugin rules
+  });
+
+  // Apply GFM plugin rules (tables, task lists, code blocks)
+  if (typeof highlightedCodeBlock === "function") {
+    turndownService.use([highlightedCodeBlock, tables, taskListItems]);
+    console.log("Applied GFM plugins");
+  } else {
+    console.warn("GFM plugins not available");
+  }
+
+  // Remove any script/style elements content (just in case)
+  turndownService.remove(["script", "style"]);
+
+  // Convert extracted HTML to Markdown text
+  let markdownBody = "";
+  try {
+    markdownBody = turndownService.turndown(contentHtml);
+    console.log("Markdown conversion complete", {
+      markdownLength: markdownBody.length,
+      firstChars: markdownBody.substring(0, 100),
+    });
+  } catch (err) {
+    console.error("Turndown conversion error:", err);
+    markdownBody = ""; // fallback to empty
+  }
+
+  // Prepare final markdown with optional frontmatter
+  let fullMarkdown = "";
+  const hasMetadata =
+    settings.includeTitle ||
+    settings.includeUrl ||
+    settings.includeAuthor ||
+    settings.includeDate;
+
+  if (hasMetadata) {
+    function escapeYaml(str) {
+      // Basic escaping, might need refinement
+      return str ? str.replace(/\n/g, " ").replace(/"/g, '"') : "";
+    }
+
+    fullMarkdown += "---\n";
+    if (settings.includeTitle && titleText) {
+      fullMarkdown += `title: "${escapeYaml(titleText)}"\n`;
+    }
+    if (settings.includeUrl && urlText) {
+      fullMarkdown += `url: "${escapeYaml(urlText)}"\n`;
+    }
+    if (settings.includeAuthor && authorText) {
+      fullMarkdown += `author: "${escapeYaml(authorText)}"\n`;
+    }
+    if (settings.includeDate && dateText) {
+      fullMarkdown += `date: "${escapeYaml(dateText)}"\n`;
+    }
+    fullMarkdown += "---\n\n";
+  }
+
+  // Add the main body
+  fullMarkdown += markdownBody;
+
+  return fullMarkdown;
+}
+
 (async function () {
   console.log("Content script started");
 
@@ -118,168 +258,69 @@ function cleanupTemporaryElements(elements) {
     async function (settings) {
       console.log("User settings:", settings);
 
-      let result;
-      let temporaryElements = []; // To store elements added by pre-processing
-
       try {
-        if (settings.parserChoice === "defuddle") {
-          // --- Defuddle Path ---
-          console.log("Using Defuddle parser.");
+        let readabilityResult, defuddleResult, result;
+        let markdownContent;
 
-          // 1. Pre-process CodeTabs specifically for Defuddle
-          temporaryElements = preprocessCodeTabsForDefuddle();
+        if (settings.parserChoice === "both") {
+          // --- Run both parsers ---
+          readabilityResult = await parseWithReadability();
+          defuddleResult = await parseWithDefuddle();
 
-          // 2. Run Defuddle
-          console.log("Initializing Defuddle parser");
-          let defuddle = new Defuddle(document, { url: document.URL });
-          result = defuddle.parse();
-          console.log("Defuddle parse result:", {
-            hasContent: !!result.content,
-            contentLength: result.content?.length,
-            title: result.title,
-            author: result.author,
-            date: result.published, // Defuddle uses 'published'
+          // Convert both results to markdown
+          const readabilityMarkdown = convertToMarkdown(
+            readabilityResult.content || "",
+            settings,
+            readabilityResult.title || document.title || "",
+            readabilityResult.byline || "",
+            readabilityResult.siteName || "",
+            document.URL
+          );
+
+          const defuddleMarkdown = convertToMarkdown(
+            defuddleResult.content || "",
+            settings,
+            defuddleResult.title || document.title || "",
+            defuddleResult.byline || "",
+            defuddleResult.siteName || "",
+            document.URL
+          );
+
+          // Send both markdown contents to the background script
+          chrome.runtime.sendMessage({
+            type: "bothEnginesResult",
+            readabilityText: readabilityMarkdown,
+            defuddleText: defuddleMarkdown,
           });
-
-          // Map Defuddle result fields to common structure
-          result.byline = result.author; // Map author to byline
-          result.siteName = result.published; // Use published date as siteName equivalent (for consistency)
+          return;
+        } else if (settings.parserChoice === "defuddle") {
+          // --- Defuddle Path ---
+          defuddleResult = await parseWithDefuddle();
+          result = defuddleResult;
         } else {
           // --- Readability Path (Default) ---
-          console.log("Using Readability parser.");
-
-          // 1. Clone the document for Readability
-          const documentClone = document.cloneNode(true);
-
-          // 2. Run Readability
-          console.log("Initializing Readability parser");
-          const reader = new Readability(documentClone);
-          result = reader.parse();
-          console.log("Readability parse result:", {
-            hasContent: !!result.content,
-            contentLength: result.content?.length,
-            title: result.title,
-            author: result.byline, // Readability uses 'byline'
-            date: result.siteName, // Readability uses 'siteName' (no reliable date)
-          });
-          // Fields already match the common structure (title, byline, siteName, content)
+          readabilityResult = await parseWithReadability();
+          result = readabilityResult;
         }
-      } catch (err) {
-        console.error(`Error during ${settings.parserChoice} parsing:`, err);
-        // Crucially, clean up even if parsing fails
-        if (settings.parserChoice === "defuddle") {
-          cleanupTemporaryElements(temporaryElements);
-        }
-        return; // Stop execution if parsing fails
-      } finally {
-        // 3. Clean up temporary DOM elements ONLY if Defuddle was used
-        if (settings.parserChoice === "defuddle") {
-          cleanupTemporaryElements(temporaryElements);
-        }
-      }
 
-      // --- Common Processing Logic ---
+        // --- Common Processing Logic ---
+        markdownContent = convertToMarkdown(
+          result.content || "",
+          settings,
+          result.title || document.title || "",
+          result.byline || "",
+          result.siteName || "",
+          document.URL
+        );
 
-      // Get extracted HTML content and metadata from the result object
-      let contentHtml = result.content || "";
-      const titleText = result.title || document.title || "";
-      const authorText = result.byline || ""; // Use byline (consistent field)
-      const dateText = result.siteName || ""; // Use siteName (consistent field)
-      const urlText = document.URL;
-
-      console.log("Extracted content stats:", {
-        contentHtmlLength: contentHtml.length,
-        titleLength: titleText.length,
-        hasAuthor: !!authorText,
-        hasDate: !!dateText, // Note: For Readability, this is siteName
-      });
-
-      // Make settings available to the GFM plugin
-      window.markdownClipperSettings = settings;
-
-      // Initialize Turndown (Markdown converter)
-      console.log("Initializing Turndown service");
-      const turndownService = new TurndownService({
-        headingStyle: "atx",
-        hr: "---",
-        bulletListMarker: "-",
-        codeBlockStyle: "fenced",
-        fence: "```",
-        emDelimiter: "_",
-        strongDelimiter: "**",
-        linkStyle: "inlined",
-        linkReferenceStyle: "full",
-        preformattedCode: false, // we'll handle pre tags via plugin rules
-      });
-
-      // Apply GFM plugin rules (tables, task lists, code blocks)
-      if (typeof highlightedCodeBlock === "function") {
-        turndownService.use([highlightedCodeBlock, tables, taskListItems]);
-        console.log("Applied GFM plugins");
-      } else {
-        console.warn("GFM plugins not available");
-      }
-
-      // Remove any script/style elements content (just in case)
-      turndownService.remove(["script", "style"]);
-
-      // Convert extracted HTML to Markdown text
-      let markdownBody = "";
-      try {
-        markdownBody = turndownService.turndown(contentHtml);
-        console.log("Markdown conversion complete", {
-          markdownLength: markdownBody.length,
-          firstChars: markdownBody.substring(0, 100),
+        // Send the Markdown to the background script
+        chrome.runtime.sendMessage({
+          type: "markdownResult",
+          text: markdownContent,
         });
       } catch (err) {
-        console.error("Turndown conversion error:", err);
-        markdownBody = ""; // fallback to empty
+        console.error(`Error during ${settings.parserChoice} parsing:`, err);
       }
-
-      // Prepare final markdown with optional frontmatter
-      let fullMarkdown = "";
-      const hasMetadata =
-        settings.includeTitle ||
-        settings.includeUrl ||
-        settings.includeAuthor ||
-        settings.includeDate;
-
-      if (hasMetadata) {
-        function escapeYaml(str) {
-          // Basic escaping, might need refinement
-          return str ? str.replace(/\n/g, " ").replace(/"/g, '"') : "";
-        }
-        let frontmatter = "---\n";
-        if (settings.includeTitle && titleText) {
-          frontmatter += `title: "${escapeYaml(titleText)}"\n`;
-        }
-        if (settings.includeUrl && urlText) {
-          frontmatter += `url: "${escapeYaml(urlText)}"\n`;
-        }
-        if (settings.includeAuthor && authorText) {
-          frontmatter += `author: "${escapeYaml(authorText)}"\n`;
-        }
-        // Only include 'date' if the setting is checked AND dateText has a value
-        // Note: For Readability, this will be the siteName if available.
-        if (settings.includeDate && dateText) {
-          frontmatter += `date: "${escapeYaml(dateText)}"\n`;
-        }
-        frontmatter += "---\n\n";
-        fullMarkdown = frontmatter + markdownBody;
-      } else {
-        fullMarkdown = markdownBody;
-      }
-
-      console.log("Final markdown stats:", {
-        totalLength: fullMarkdown.length,
-        hasFrontmatter: hasMetadata,
-      });
-
-      // Send the markdown result back to the background script
-      chrome.runtime.sendMessage({
-        type: "markdownResult",
-        text: fullMarkdown,
-      });
     }
   );
 })();

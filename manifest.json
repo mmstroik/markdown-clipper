@@ -19,7 +19,8 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "clipboardWrite"
   ],
   "background": {
     "service_worker": "background.js"
@@ -39,7 +40,11 @@
   "web_accessible_resources": [{
     "resources": [
       "turndown-plugin-gfm.js",
-      "contentScript.js"
+      "contentScript.js",
+      "copyHelper.js",
+      "output.html",
+      "output.css",
+      "output.js"
     ],
     "matches": [ "<all_urls>" ]
   }]

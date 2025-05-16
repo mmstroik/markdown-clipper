@@ -23,36 +23,45 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-// Listen for messages from the content script
-chrome.runtime.onMessage.addListener((message, sender) => {
+// Listen for messages from the content script or data: URL tabs
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "markdownResult" && message.text) {
-    // Escape basic HTML entities for safe embedding in <pre>
-    const escapedText = message.text.replace(
-      /[<>&]/g,
-      (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c] || c)
-    );
+    const outputPageUrl = chrome.runtime.getURL("output.html");
+    const params = new URLSearchParams();
+    params.append("viewType", "single");
+    params.append("text1", message.text); // Raw text, output.js will escape it
 
-    // Construct the HTML for the new tab
-    const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="color-scheme" content="light dark">
-  <title>Clipped Markdown</title>
-  <style>
-    pre { white-space: pre-wrap; word-wrap: break-word; }
-  </style>
-</head>
-<body>
-  <pre>${escapedText}</pre>
-</body>
-</html>`;
+    const fullUrl = `${outputPageUrl}?${params.toString()}`;
 
-    // Open a new tab with the generated HTML
     chrome.storage.sync.get({ openNextToCurrent: true }, function (settings) {
       chrome.tabs.create({
-        url: "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent),
-        index: settings.openNextToCurrent ? sender.tab.index + 1 : undefined,
+        url: fullUrl,
+        index:
+          settings.openNextToCurrent && sender.tab
+            ? sender.tab.index + 1
+            : undefined,
+      });
+    });
+  } else if (
+    message.type === "bothEnginesResult" &&
+    message.readabilityText &&
+    message.defuddleText
+  ) {
+    const outputPageUrl = chrome.runtime.getURL("output.html");
+    const params = new URLSearchParams();
+    params.append("viewType", "dual");
+    params.append("text1", message.readabilityText); // Raw text
+    params.append("text2", message.defuddleText); // Raw text
+
+    const fullUrl = `${outputPageUrl}?${params.toString()}`;
+
+    chrome.storage.sync.get({ openNextToCurrent: true }, function (settings) {
+      chrome.tabs.create({
+        url: fullUrl,
+        index:
+          settings.openNextToCurrent && sender.tab
+            ? sender.tab.index + 1
+            : undefined,
       });
     });
   }

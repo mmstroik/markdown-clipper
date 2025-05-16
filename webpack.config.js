@@ -88,9 +88,13 @@ module.exports = (env, argv) => {
         patterns: [
           { from: "manifest.json", to: "manifest.json" },
           { from: "turndown-plugin-gfm.js", to: "turndown-plugin-gfm.js" },
+          { from: "copyHelper.js", to: "copyHelper.js" },
           { from: "icons", to: "icons" },
           { from: "options.html", to: "options.html" },
           { from: "options.js", to: "options.js" },
+          { from: "output.html", to: "output.html" },
+          { from: "output.css", to: "output.css" },
+          { from: "output.js", to: "output.js" },
         ],
       }),
       ...(isProduction
