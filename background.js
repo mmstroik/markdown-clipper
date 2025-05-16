@@ -44,8 +44,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   } else if (
     message.type === "bothEnginesResult" &&
-    message.readabilityText &&
-    message.defuddleText
+    typeof message.readabilityText === "string" &&
+    typeof message.defuddleText === "string"
   ) {
     const outputPageUrl = chrome.runtime.getURL("output.html");
     const params = new URLSearchParams();
