@@ -180,7 +180,9 @@
     tableCell: {
       filter: ["th", "td"],
       replacement: function (content, node) {
-        var preserveLinebreaks = settings && settings.preserveTableLinebreaks;
+        var preserveLinebreaks =
+          window.markdownClipperSettings &&
+          window.markdownClipperSettings.preserveTableLinebreaks;
 
         var cleanedContent;
         if (preserveLinebreaks) {
