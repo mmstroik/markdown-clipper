@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
   } else if (viewType === "dual") {
-    document.body.style.overflow = "hidden"; // Prevent body scroll for dual view
+    document.body.classList.add("dual-view-body"); // Prevent body scroll for dual view
     mainContainer.classList.add("dual-view-container");
     mainContainer.innerHTML = `
       <div class="column">
