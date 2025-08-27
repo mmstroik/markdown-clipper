@@ -13,16 +13,31 @@ if (!fs.existsSync(buildsDir)) {
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production";
+  const browser = env.BROWSER || "chrome"; // Default to chrome if not specified
+  
+  console.log(`Building for: ${browser}`);
   console.log(`Build mode: ${isProduction ? "production" : "development"}`);
+
+  const outputDir = path.resolve(__dirname, `dist-${browser}`);
+  
+  // Determine which background script to use
+  const backgroundScript = browser === "firefox" 
+    ? "./src/firefox/background.js" 
+    : "./src/shared/background.js";
+
+  // Determine which manifest to use
+  const manifestSource = browser === "firefox"
+    ? "src/firefox/manifest.json"
+    : "src/chrome/manifest.json";
 
   return {
     entry: {
-      background: "./background.js",
-      contentScript: "./contentScript.js",
+      background: backgroundScript,
+      contentScript: "./src/shared/contentScript.js",
     },
     output: {
       filename: "[name].js",
-      path: path.resolve(__dirname, "dist"),
+      path: outputDir,
       environment: {
         // The environment supports arrow functions
         arrowFunction: true,
@@ -86,22 +101,22 @@ module.exports = (env, argv) => {
     plugins: [
       new CopyPlugin({
         patterns: [
-          { from: "manifest.json", to: "manifest.json" },
-          { from: "turndown-gfm.js", to: "turndown-gfm.js" },
-          { from: "copyHelper.js", to: "copyHelper.js" },
-          { from: "icons", to: "icons" },
-          { from: "options.html", to: "options.html" },
-          { from: "options.js", to: "options.js" },
-          { from: "output.html", to: "output.html" },
-          { from: "output.css", to: "output.css" },
-          { from: "output.js", to: "output.js" },
+          { from: manifestSource, to: "manifest.json" },
+          { from: "src/shared/turndown-gfm.js", to: "turndown-gfm.js" },
+          { from: "src/shared/copyHelper.js", to: "copyHelper.js" },
+          { from: "src/shared/icons", to: "icons" },
+          { from: "src/shared/options.html", to: "options.html" },
+          { from: "src/shared/options.js", to: "options.js" },
+          { from: "src/shared/output.html", to: "output.html" },
+          { from: "src/shared/output.css", to: "output.css" },
+          { from: "src/shared/output.js", to: "output.js" },
         ],
       }),
       ...(isProduction
         ? [
             new ZipPlugin({
               path: path.resolve(__dirname, "builds"),
-              filename: `markdown-clipper-${package.version}.zip`,
+              filename: `markdown-clipper-${browser}-${package.version}.zip`,
             }),
           ]
         : []),

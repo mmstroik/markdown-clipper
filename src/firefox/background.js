@@ -1,16 +1,21 @@
-// Background script (service worker)
-chrome.action.onClicked.addListener(async (tab) => {
+// Background script for Firefox (Manifest V2)
+browser.browserAction.onClicked.addListener(async (tab) => {
   if (tab.id) {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["turndown-gfm.js", "contentScript.js"],
+    browser.tabs.executeScript(tab.id, {
+      file: "turndown-gfm.js"
+    }).then(() => {
+      return browser.tabs.executeScript(tab.id, {
+        file: "contentScript.js"
+      });
+    }).catch((error) => {
+      console.error("Failed to inject scripts:", error);
     });
   }
 });
 
-chrome.runtime.onInstalled.addListener((details) => {
+browser.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
-    chrome.storage.sync.set({
+    browser.storage.sync.set({
       includeTitle: true,
       includeUrl: true,
       includeAuthor: true,
@@ -21,17 +26,17 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 // Listen for messages from the content script or data: URL tabs
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "markdownResult" && message.text) {
-    const outputPageUrl = chrome.runtime.getURL("output.html");
+    const outputPageUrl = browser.runtime.getURL("output.html");
     const params = new URLSearchParams();
     params.append("viewType", "single");
     params.append("text1", message.text); // Raw text, output.js will escape it
 
     const fullUrl = `${outputPageUrl}?${params.toString()}`;
 
-    chrome.storage.sync.get({ openNextToCurrent: true }, function (settings) {
-      chrome.tabs.create({
+    browser.storage.sync.get({ openNextToCurrent: true }, function (settings) {
+      browser.tabs.create({
         url: fullUrl,
         index:
           settings.openNextToCurrent && sender.tab
@@ -44,7 +49,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     typeof message.readabilityText === "string" &&
     typeof message.defuddleText === "string"
   ) {
-    const outputPageUrl = chrome.runtime.getURL("output.html");
+    const outputPageUrl = browser.runtime.getURL("output.html");
     const params = new URLSearchParams();
     params.append("viewType", "dual");
     params.append("text1", message.readabilityText);
@@ -52,8 +57,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     const fullUrl = `${outputPageUrl}?${params.toString()}`;
 
-    chrome.storage.sync.get({ openNextToCurrent: true }, function (settings) {
-      chrome.tabs.create({
+    browser.storage.sync.get({ openNextToCurrent: true }, function (settings) {
+      browser.tabs.create({
         url: fullUrl,
         index:
           settings.openNextToCurrent && sender.tab

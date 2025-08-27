@@ -1,3 +1,5 @@
+const browser = typeof chrome !== 'undefined' ? chrome : window.browser;
+
 function saveOptions() {
   const parserChoice = document.querySelector(
     'input[name="parser"]:checked'
@@ -14,7 +16,7 @@ function saveOptions() {
     ).checked,
   };
 
-  chrome.storage.sync.set(settings, function () {
+  browser.storage.sync.set(settings, function () {
     // Show saved status
     const status = document.getElementById("status");
     status.classList.add("visible");
@@ -26,7 +28,7 @@ function saveOptions() {
 }
 
 function restoreOptions() {
-  chrome.storage.sync.get(
+  browser.storage.sync.get(
     {
       parserChoice: "readability",
       includeTitle: true,

@@ -2,3 +2,5 @@ permissions.txt
 node_modules
 dist
 builds
+dist-firefox
+dist-chrome

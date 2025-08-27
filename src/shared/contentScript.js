@@ -225,7 +225,9 @@ function convertToMarkdown(
     return;
   }
 
-  chrome.storage.sync.get(
+  const browser = typeof chrome !== 'undefined' ? chrome : window.browser;
+  
+  browser.storage.sync.get(
     {
       parserChoice: "readability",
       includeTitle: true,
@@ -263,7 +265,7 @@ function convertToMarkdown(
             document.URL
           );
 
-          chrome.runtime.sendMessage({
+          browser.runtime.sendMessage({
             type: "bothEnginesResult",
             readabilityText: readabilityMarkdown,
             defuddleText: defuddleMarkdown,
@@ -286,7 +288,7 @@ function convertToMarkdown(
           document.URL
         );
 
-        chrome.runtime.sendMessage({
+        browser.runtime.sendMessage({
           type: "markdownResult",
           text: markdownContent,
         });
