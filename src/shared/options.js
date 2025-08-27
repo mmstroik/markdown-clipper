@@ -10,6 +10,7 @@ function saveOptions() {
     includeUrl: document.getElementById("include-url").checked,
     includeAuthor: document.getElementById("include-author").checked,
     includeDate: document.getElementById("include-date").checked,
+    removeImages: document.getElementById("remove-images").checked,
     openNextToCurrent: document.getElementById("open-next-to-current").checked,
     preserveTableLinebreaks: document.getElementById(
       "preserve-table-linebreaks"
@@ -35,6 +36,7 @@ function restoreOptions() {
       includeUrl: true,
       includeAuthor: true,
       includeDate: false,
+      removeImages: false,
       openNextToCurrent: true,
       preserveTableLinebreaks: false,
     },
@@ -52,6 +54,7 @@ function restoreOptions() {
       document.getElementById("include-url").checked = items.includeUrl;
       document.getElementById("include-author").checked = items.includeAuthor;
       document.getElementById("include-date").checked = items.includeDate;
+      document.getElementById("remove-images").checked = items.removeImages;
       document.getElementById("open-next-to-current").checked =
         items.openNextToCurrent;
       document.getElementById("preserve-table-linebreaks").checked =
@@ -73,6 +76,7 @@ document
   .getElementById("include-author")
   .addEventListener("change", saveOptions);
 document.getElementById("include-date").addEventListener("change", saveOptions);
+document.getElementById("remove-images").addEventListener("change", saveOptions);
 document
   .getElementById("open-next-to-current")
   .addEventListener("change", saveOptions);

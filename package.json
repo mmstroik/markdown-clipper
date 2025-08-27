@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.6.0",
-		"defuddle": "^0.6.2",
+		"defuddle": "^0.6.6",
 		"turndown": "^7.2.0"
 	},
 	"devDependencies": {

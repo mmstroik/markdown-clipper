@@ -100,18 +100,45 @@ async function parseWithDefuddle() {
 
   try {
     console.log("Initializing Defuddle parser");
-    let defuddle = new Defuddle(document, { url: document.URL });
+    const settings = await new Promise((resolve) => {
+      browser.storage.sync.get({ removeImages: false }, resolve);
+    });
+    
+    let defuddle = new Defuddle(document, { 
+      url: document.URL,
+      removeImages: settings.removeImages
+    });
     const result = defuddle.parse();
     console.log("Defuddle parse result:", {
       hasContent: !!result.content,
       contentLength: result.content?.length,
       title: result.title,
       author: result.author,
-      date: result.published,
+      date: result.published
     });
 
+    result.title = result.title || 
+                   result.metaTags?.['og:title'] ||
+                   result.metaTags?.['twitter:title'] ||
+                   document.title || "";
+                   
+    result.author = result.author ||
+                    result.metaTags?.['article:author'] ||
+                    result.metaTags?.['author'] ||
+                    result.metaTags?.['twitter:creator'] ||
+                    result.metaTags?.['og:author'] || "";
+                    
+    result.description = result.description ||
+                         result.metaTags?.['description'] ||
+                         result.metaTags?.['og:description'] ||
+                         result.metaTags?.['twitter:description'] || "";
+                         
+    result.published = result.published ||
+                       result.metaTags?.['article:published_time'] ||
+                       result.metaTags?.['article:modified_time'] ||
+                       result.metaTags?.['date'] || "";
+
     result.byline = result.author;
-    result.siteName = result.published;
 
     return result;
   } finally {
@@ -252,7 +279,7 @@ function convertToMarkdown(
             settings,
             readabilityResult.title || document.title || "",
             readabilityResult.byline || "",
-            readabilityResult.siteName || "",
+            readabilityResult.date || "",
             document.URL
           );
 
@@ -261,7 +288,7 @@ function convertToMarkdown(
             settings,
             defuddleResult.title || document.title || "",
             defuddleResult.byline || "",
-            defuddleResult.siteName || "",
+            defuddleResult.published || "",
             document.URL
           );
 
@@ -284,7 +311,7 @@ function convertToMarkdown(
           settings,
           result.title || document.title || "",
           result.byline || "",
-          result.siteName || "",
+          result.published || result.date || "",
           document.URL
         );
 
