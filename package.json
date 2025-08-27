@@ -7,9 +7,7 @@
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",
 		"build:chrome": "webpack --env BROWSER=chrome --mode production",
 		"build:firefox": "webpack --env BROWSER=firefox --mode production",
-		"build:all": "pnpm run build:chrome && pnpm run build:firefox",
-		"dev": "webpack --watch --env BROWSER=chrome --mode development",
-		"build": "pnpm run build:all"
+		"build:all": "pnpm run build:chrome && pnpm run build:firefox"
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.6.0",
