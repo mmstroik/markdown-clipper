@@ -11,7 +11,8 @@
 		"run:firefox": "dotenvx run -- web-ext run --source-dir dist-firefox",
 		"run:firefox-android": "dotenvx run -- web-ext run --source-dir dist-firefox --target=firefox-android",
 		"lint:firefox": "web-ext lint --source-dir dist-firefox",
-		"bump": "pnpx @jsdevtools/version-bump-prompt package.json src/firefox/manifest.json src/chrome/manifest.json"
+		"bump": "pnpx @jsdevtools/version-bump-prompt package.json src/firefox/manifest.json src/chrome/manifest.json",
+		"zip:source": "zip -r \"builds/markdown-clipper-source-v$(node -p \"require('./package.json').version\").zip\" . -x \"node_modules/*\" \"builds/*\" \"dist-*/*\" \".git/*\" \"*.log\" \"CLAUDE.md\" \".env\" \".claude/*\""
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.6.0",
