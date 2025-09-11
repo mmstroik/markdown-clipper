@@ -256,7 +256,7 @@ function convertToMarkdown(
   
   browser.storage.sync.get(
     {
-      parserChoice: "readability",
+      parserChoice: "both",
       includeTitle: true,
       includeUrl: true,
       includeAuthor: true,
