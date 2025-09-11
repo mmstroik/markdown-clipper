@@ -17,14 +17,14 @@
 	"dependencies": {
 		"@mozilla/readability": "^0.6.0",
 		"defuddle": "^0.6.6",
-		"turndown": "^7.2.0"
+		"turndown": "^7.2.1"
 	},
 	"devDependencies": {
 		"@dotenvx/dotenvx": "^1.49.0",
 		"copy-webpack-plugin": "^11.0.0",
-		"terser-webpack-plugin": "^5.3.10",
+		"terser-webpack-plugin": "^5.3.14",
 		"web-ext": "^8.9.0",
-		"webpack": "^5.99.5",
+		"webpack": "^5.101.3",
 		"webpack-cli": "^6.0.1",
 		"zip-webpack-plugin": "^4.0.3"
 	},
