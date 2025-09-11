@@ -1,6 +1,6 @@
 {
 	"name": "markdown-clipper",
-	"version": "1.0.7",
+	"version": "1.1.0",
 	"description": "A browser extension for Chrome and Firefox that extracts the main content of a webpage and converts it to Markdown.",
 	"scripts": {
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
@@ -10,7 +10,8 @@
 		"build:all": "pnpm run build:chrome && pnpm run build:firefox",
 		"run:firefox": "dotenvx run -- web-ext run --source-dir dist-firefox",
 		"run:firefox-android": "dotenvx run -- web-ext run --source-dir dist-firefox --target=firefox-android",
-		"lint:firefox": "web-ext lint --source-dir dist-firefox"
+		"lint:firefox": "web-ext lint --source-dir dist-firefox",
+		"bump": "pnpx @jsdevtools/version-bump-prompt package.json src/firefox/manifest.json src/chrome/manifest.json"
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.6.0",
