@@ -7,7 +7,10 @@
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",
 		"build:chrome": "webpack --env BROWSER=chrome --mode production",
 		"build:firefox": "webpack --env BROWSER=firefox --mode production",
-		"build:all": "pnpm run build:chrome && pnpm run build:firefox"
+		"build:all": "pnpm run build:chrome && pnpm run build:firefox",
+		"run:firefox": "dotenvx run -- web-ext run --source-dir dist-firefox",
+		"run:firefox-android": "dotenvx run -- web-ext run --source-dir dist-firefox --target=firefox-android",
+		"lint:firefox": "web-ext lint --source-dir dist-firefox"
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.6.0",
@@ -15,8 +18,10 @@
 		"turndown": "^7.2.0"
 	},
 	"devDependencies": {
+		"@dotenvx/dotenvx": "^1.49.0",
 		"copy-webpack-plugin": "^11.0.0",
 		"terser-webpack-plugin": "^5.3.10",
+		"web-ext": "^8.9.0",
 		"webpack": "^5.99.5",
 		"webpack-cli": "^6.0.1",
 		"zip-webpack-plugin": "^4.0.3"

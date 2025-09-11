@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const text1 = params.get("text1") || "";
   const text2 = params.get("text2"); // Only present for "dual"
 
+  // Detect if running on mobile device
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.matchMedia("(max-width: 768px)").matches;
+
   if (text1.trim() === "") {
     console.warn("Warning: Primary text content (text1) is empty");
   }
@@ -49,14 +53,19 @@ document.addEventListener("DOMContentLoaded", () => {
   } else if (viewType === "dual") {
     document.body.classList.add("dual-view-body"); // Prevent body scroll for dual view
     mainContainer.classList.add("dual-view-container");
+    
+    // Use shorter titles on mobile to save space
+    const readabilityTitle = isMobile ? "Readability" : "Readability Extraction Engine";
+    const defuddleTitle = isMobile ? "Defuddle" : "Defuddle Extraction Engine";
+    
     mainContainer.innerHTML = `
       <div class="column">
-        <div class="column-header" role="heading" aria-level="2"><span class="column-title">Readability Extraction Engine</span></div>
+        <div class="column-header" role="heading" aria-level="2"><span class="column-title">${readabilityTitle}</span></div>
         <button class="copy-btn" id="copyBtnReadability" aria-label="Copy Readability output to clipboard">Copy</button>
         <div class="content-wrapper"><pre id="readability-content">${escapedText1}</pre></div>
       </div>
       <div class="column">
-        <div class="column-header" role="heading" aria-level="2"><span class="column-title">Defuddle Extraction Engine</span></div>
+        <div class="column-header" role="heading" aria-level="2"><span class="column-title">${defuddleTitle}</span></div>
         <button class="copy-btn" id="copyBtnDefuddle" aria-label="Copy Defuddle output to clipboard">Copy</button>
         <div class="content-wrapper"><pre id="defuddle-content">${escapedText2}</pre></div>
       </div>

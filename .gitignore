@@ -4,3 +4,4 @@ dist
 builds
 dist-firefox
 dist-chrome
+.env

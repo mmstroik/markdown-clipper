@@ -41,6 +41,9 @@
     "gecko": {
       "id": "markdown-clipper@example.com",
       "strict_min_version": "78.0"
+    },
+    "gecko_android": {
+      "strict_min_version": "113.0"
     }
   }
 }

@@ -3,6 +3,7 @@
   <head>
     <title>Markdown Clipper Options</title>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="color-scheme" content="light dark" />
     <style>
       body {
@@ -46,6 +47,60 @@
         font-size: 1rem;
         margin: 0 0 15px 0;
         color: #808080;
+      }
+      
+      /* Mobile responsive styles */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+          font-size: 16px; /* Prevent zoom on iOS */
+        }
+        
+        .option-row {
+          padding: 8px 0;
+          min-height: 48px; /* Touch-friendly target size */
+        }
+        
+        input[type="checkbox"],
+        input[type="radio"] {
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+        }
+        
+        label {
+          font-size: 16px;
+          padding: 12px;
+          cursor: pointer;
+        }
+        
+        h1 {
+          font-size: 1.3rem;
+        }
+        
+        .metadata-section {
+          padding: 12px;
+          margin-bottom: 10px;
+        }
+        
+        .metadata-section h2 {
+          font-size: 1.1rem;
+          margin-bottom: 10px;
+        }
+      }
+      
+      @media (max-width: 360px) {
+        body {
+          padding: 8px;
+        }
+        
+        h1 {
+          font-size: 1.2rem;
+        }
+        
+        label {
+          font-size: 14px;
+        }
       }
     </style>
   </head>

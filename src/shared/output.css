@@ -109,4 +109,84 @@ pre {
   }
   .copy-btn:hover { background: #005fa3; }
   .copy-btn:active { background: #004c82; }
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  /* Convert dual view from side-by-side to stacked on mobile */
+  #main-container.dual-view-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .column {
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .column:last-child {
+    border-bottom: none;
+  }
+
+  /* Ensure touch-friendly button sizes (minimum 48x48px) */
+  .copy-btn {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  /* Adjust button positioning for mobile */
+  #main-container.single-view-container > .copy-btn {
+    top: 10px;
+    right: 10px;
+  }
+
+  .column > .copy-btn {
+    top: 50px;
+    right: 10px;
+  }
+
+  /* Adjust content padding for mobile */
+  .content-wrapper {
+    padding: 10px;
+  }
+
+  /* Ensure headers are touch-friendly */
+  .column-header {
+    min-height: 48px;
+    padding: 12px 10px;
+  }
+
+  /* Adjust title size for mobile */
+  .column-title {
+    font-size: 14px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  body {
+    font-size: 13px;
+  }
+
+  .copy-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .content-wrapper {
+    padding: 8px;
+  }
+}
+
+/* Dark mode adjustments for mobile */
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+  .column {
+    border-bottom-color: #555;
+  }
 } 
